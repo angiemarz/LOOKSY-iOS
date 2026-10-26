@@ -3,8 +3,8 @@ import SwiftData
 import UIKit
 @testable import LOOKSY
 
-@MainActor
 enum TestSupport {
+    @MainActor
     static func makeContext() -> ModelContext {
         let container = LOOKSYApp.makeContainer(inMemory: true)
         retainedContainers.append(container)
@@ -12,6 +12,7 @@ enum TestSupport {
     }
 
     /// Containers must outlive their contexts during a test.
+    @MainActor
     static var retainedContainers: [ModelContainer] = []
 
     static func temporaryDirectory() -> URL {

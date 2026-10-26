@@ -19,6 +19,9 @@ final class InspirationReference {
     var isFavorite: Bool = false
     var linkedLookIDs: [UUID] = []
     var linkedGarmentIDs: [UUID] = []
+    /// JSON-encoded `RecreationTarget` described by the user ("Recrea este look").
+    var targetData: Data?
+    var formality: Int = 2
     var createdAt: Date = Date()
 
     init(id: UUID = UUID(), title: String, urlString: String? = nil, searchQuery: String? = nil, createdAt: Date = Date()) {
@@ -37,6 +40,11 @@ final class InspirationReference {
     var style: FashionStyle? {
         get { styleRaw.flatMap(FashionStyle.init(rawValue:)) }
         set { styleRaw = newValue?.rawValue }
+    }
+
+    var target: RecreationTarget? {
+        get { targetData.flatMap { try? JSONDecoder().decode(RecreationTarget.self, from: $0) } }
+        set { targetData = newValue.flatMap { try? JSONEncoder().encode($0) } }
     }
 
     var url: URL? {

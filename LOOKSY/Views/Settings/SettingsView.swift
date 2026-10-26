@@ -19,6 +19,11 @@ struct SettingsView: View {
 
             Section("Datos") {
                 NavigationLink {
+                    BackupView()
+                } label: {
+                    Label("Respaldo y restauración", systemImage: "externaldrive.badge.timemachine")
+                }
+                NavigationLink {
                     StorageView()
                 } label: {
                     Label("Almacenamiento", systemImage: "internaldrive")
