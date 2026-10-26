@@ -22,6 +22,12 @@ struct UserPreferences: Codable, Equatable, Sendable {
 
     init() {}
 
+    enum CodingKeys: String, CodingKey {
+        case version, displayName, favoriteStyles, favoriteColors, avoidedColors, favoriteGarmentIDs
+        case preferredShoes, comfortLevel, usualFormality, silhouettePreferences, frequentOccasions
+        case seasons, avoidHeels
+    }
+
     // Tolerant decoding so new fields never break older backups.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
