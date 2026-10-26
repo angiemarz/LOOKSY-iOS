@@ -1,0 +1,97 @@
+# XcodeGen spec for LOOKSY.
+# Generate the project with: xcodegen generate
+# The .xcodeproj is NOT committed; GitHub Actions regenerates it on every build.
+name: LOOKSY
+
+options:
+  bundleIdPrefix: com.angiemarz
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: es
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    # Builds never require a paid Apple Developer certificate.
+    # AltStore re-signs the app with the user's free Apple ID on the iPhone.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+    DEVELOPMENT_TEAM: ""
+  configs:
+    Debug:
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+    Release:
+      SWIFT_OPTIMIZATION_LEVEL: "-O"
+      SWIFT_COMPILATION_MODE: wholemodule
+
+targets:
+  LOOKSY:
+    type: application
+    platform: iOS
+    sources:
+      - path: LOOKSY
+    settings:
+      base:
+        # Keep this identifier stable: AltStore uses it to update the app
+        # without deleting your local wardrobe data.
+        PRODUCT_BUNDLE_IDENTIFIER: com.angiemarz.looksy
+        PRODUCT_NAME: LOOKSY
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_FILE: LOOKSY/Resources/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    info:
+      path: LOOKSY/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: LOOKSY
+        CFBundleName: LOOKSY
+        CFBundleDevelopmentRegion: es
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: AccentColor
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIRequiredDeviceCapabilities:
+          - arm64
+        NSCameraUsageDescription: LOOKSY usa la cámara para fotografiar tus prendas. Las fotos se guardan solo en tu iPhone.
+        NSPhotoLibraryUsageDescription: LOOKSY necesita acceso a tus fotos para importar imágenes de tus prendas e inspiración. Nada se envía a internet.
+        NSPhotoLibraryAddUsageDescription: LOOKSY guarda en Fotos los collages que exportas.
+        LSApplicationQueriesSchemes:
+          - pinterest
+        UIFileSharingEnabled: false
+        LSSupportsOpeningDocumentsInPlace: false
+    scheme:
+      testTargets:
+        - LOOKSYTests
+      gatherCoverageData: false
+
+  LOOKSYTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: LOOKSYTests
+    dependencies:
+      - target: LOOKSY
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.angiemarz.looksy.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/LOOKSY.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LOOKSY
+        BUNDLE_LOADER: $(TEST_HOST)
