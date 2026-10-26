@@ -9,7 +9,7 @@ _Última actualización: 2026-10-26 — sesión 1._
 
 | Elemento | Estado |
 |---|---|
-| Compilación en GitHub Actions | ⛔ **No verificada todavía**: el push a GitHub fue rechazado (403, la app de GitHub de Claude no está instalada en el repo). No existe evidencia de compilación. |
+| Compilación en GitHub Actions | ⏳ Pendiente del primer run de CI. |
 | Tests XCTest | Escritos; **no ejecutados** (requieren CI). |
 | IPA | Script de empaquetado/validación listo; **no generada** todavía. |
 | Instalación en iPhone | No probada. |
@@ -61,7 +61,8 @@ _Última actualización: 2026-10-26 — sesión 1._
 - Almacenamiento: uso de espacio, limpieza de imágenes huérfanas.
 
 ### Fase 6 — Estabilización — Pendiente
-- [ ] **Desbloquear el push** (instalar la app de GitHub de Claude en el repo) y obtener el primer run de CI.
+- [x] Push a GitHub habilitado.
+- [ ] Obtener el primer run verde de CI.
 - [ ] Corregir errores de compilación que reporte CI.
 - [ ] Revisar resultados de tests en CI.
 - [ ] Probar instalación con AltStore en el iPhone de la usuaria y registrar el resultado.
@@ -77,4 +78,5 @@ _Última actualización: 2026-10-26 — sesión 1._
 ## Historial de commits
 | Commit | Rama | Descripción |
 |---|---|---|
-| `d88d064` | `claude/dreamy-hypatia-v3l33w` (local) | chore: initialize LOOKSY iOS project (Fase 1) |
+| `d88d064` | `claude/dreamy-hypatia-v3l33w` | chore: initialize LOOKSY iOS project (Fase 1) |
+| `e52ff52` | `claude/dreamy-hypatia-v3l33w` | feat: stylist engine, collages, Pinterest, looks, backups (Fases 2–5) |
