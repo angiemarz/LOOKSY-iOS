@@ -62,6 +62,7 @@ for IPA in "$OUT/LOOKSY-unsigned.ipa" "$OUT/LOOKSY-adhoc.ipa"; do
   ls -lh "$IPA"
 done
 
+XCODE_VERSION=$(xcodebuild -version 2>/dev/null | tr '\n' ' ')
 {
   echo "LOOKSY $VERSION ($BUILD)"
   echo "Bundle ID: $BUNDLE_ID"
@@ -69,7 +70,7 @@ done
   echo "Architectures: $ARCHS"
   echo "Commit: ${GITHUB_SHA:-local}"
   echo "Built: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "Xcode: $(xcodebuild -version | head -n 1)"
+  echo "Xcode: $XCODE_VERSION"
   echo ""
   echo "LOOKSY-adhoc.ipa    -> recommended for AltStore (ad-hoc signature, AltStore re-signs it)"
   echo "LOOKSY-unsigned.ipa -> alternative without any signature"
