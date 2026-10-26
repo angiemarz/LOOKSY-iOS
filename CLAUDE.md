@@ -77,6 +77,7 @@ Workflow `.github/workflows/build-ios.yml` (push a `main` y `claude/**`, PR a `m
    valida plataforma (Mach-O platform 2, arm64, `CFBundleSupportedPlatforms=iPhoneOS`), crea
    `LOOKSY-unsigned.ipa` y `LOOKSY-adhoc.ipa` (firma ad-hoc `codesign -s -`, sin certificados) y los sube como artefacto `LOOKSY-ipa`.
 - XcodeGen fijado en `XCODEGEN_VERSION` (descarga del release oficial; Homebrew como respaldo).
+- Último estado verificado: run #3 (`afb225b`) verde con Xcode 26.3 — build `iphoneos` + 58 tests.
 - No hay Swift en el contenedor Linux de Claude Code: **la única verificación de compilación es CI**. No declarar
   "compila" sin evidencia del workflow. Limitar reintentos a fallos concretos.
 

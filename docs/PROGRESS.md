@@ -9,13 +9,21 @@ _Última actualización: 2026-10-26 — sesión 1._
 
 | Elemento | Estado |
 |---|---|
-| Compilación en GitHub Actions | ⏳ Pendiente del primer run de CI. |
-| Tests XCTest | Escritos; **no ejecutados** (requieren CI). |
-| IPA | Script de empaquetado/validación listo; **no generada** todavía. |
-| Instalación en iPhone | No probada. |
+| Compilación `iphoneos` (Release, sin firma) | ✅ **Compilado** — run #3 `afb225b`, Xcode 26.3, runner `macos-15`: `** BUILD SUCCEEDED **` ([run](https://github.com/angiemarz/LOOKSY-iOS/actions/runs/40390546486)) |
+| Validación del binario | ✅ arm64 · Mach-O platform 2 (iOS dispositivo) · `CFBundleSupportedPlatforms = iPhoneOS` · iOS mínimo 17.0 · Bundle ID `com.angiemarz.looksy` |
+| IPA | ✅ `LOOKSY-adhoc.ipa` (1.7 MB, `codesign --verify` OK) y `LOOKSY-unsigned.ipa` (1.6 MB) con estructura `Payload/LOOKSY.app` validada; artefacto `LOOKSY-ipa` (caduca 2026-11-25) |
+| Tests XCTest | ✅ **58 tests, 0 fallos** en simulador iPhone 16 (iOS 26.2) — mismo run #3 |
+| Instalación con AltStore en iPhone | ⏳ **No probada** — la debe confirmar la usuaria (ver `docs/INSTALL_WINDOWS.md`) |
+| Prueba manual de la UI en iPhone | ⏳ No probada en dispositivo físico |
 
-> En el contenedor de Claude Code no hay compilador Swift (Linux sin toolchain), así que la única verificación posible
-> es GitHub Actions. Hasta ver un run verde, considera el código **implementado pero no compilado**.
+> El contenedor de Claude Code no tiene compilador Swift; toda verificación de compilación y tests es de GitHub Actions.
+
+### Historial de CI
+| Run | Commit | Resultado |
+|---|---|---|
+| #1 | `e52ff52` | ❌ build: `UserPreferences.swift` no encontraba `CodingKeys` sintetizado |
+| #2 | `92b7de4` | ✅ build + IPA; tests cancelados por un push posterior |
+| #3 | `afb225b` | ✅ build + IPA, ✅ 58/58 tests |
 
 ## Fases
 
@@ -62,9 +70,8 @@ _Última actualización: 2026-10-26 — sesión 1._
 
 ### Fase 6 — Estabilización — Pendiente
 - [x] Push a GitHub habilitado.
-- [ ] Obtener el primer run verde de CI.
-- [ ] Corregir errores de compilación que reporte CI.
-- [ ] Revisar resultados de tests en CI.
+- [x] Primer run verde de CI (build + 58 tests).
+- [ ] Actualizar `actions/checkout` y `upload-artifact` a versiones con Node 24 (hoy solo avisos de deprecación).
 - [ ] Probar instalación con AltStore en el iPhone de la usuaria y registrar el resultado.
 - [ ] Revisión de accesibilidad con VoiceOver y Dynamic Type grandes en dispositivo.
 - [ ] Perfilado de memoria con armarios grandes (respaldo en memoria; considerar streaming si hay >300 prendas).
@@ -80,3 +87,12 @@ _Última actualización: 2026-10-26 — sesión 1._
 |---|---|---|
 | `d88d064` | `claude/dreamy-hypatia-v3l33w` | chore: initialize LOOKSY iOS project (Fase 1) |
 | `e52ff52` | `claude/dreamy-hypatia-v3l33w` | feat: stylist engine, collages, Pinterest, looks, backups (Fases 2–5) |
+| `9ca7145` | `claude/dreamy-hypatia-v3l33w` | docs: progress |
+| `92b7de4` | `claude/dreamy-hypatia-v3l33w` | fix: UserPreferences coding keys (primer build verde) |
+| `afb225b` | `claude/dreamy-hypatia-v3l33w` | ci: broken pipe al imprimir versión de Xcode |
+
+## Siguiente paso concreto
+1. Revisar y aprobar el Pull Request hacia `main`.
+2. Descargar el artefacto `LOOKSY-ipa`, instalar `LOOKSY-adhoc.ipa` con AltStore (guía `docs/INSTALL_WINDOWS.md`) y
+   anotar aquí el resultado (modelo de iPhone, versión de iOS, si abrió, errores).
+3. Probar en el iPhone: agregar 8–10 prendas reales, "Crear outfit", editar un collage y exportarlo, crear un respaldo.
