@@ -1,0 +1,133 @@
+name: Build iOS
+
+# Compiles LOOKSY on a free GitHub-hosted macOS runner (free for public repos),
+# runs the unit tests on the iOS Simulator and packages an IPA for AltStore.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  push:
+    branches:
+      - main
+      - "claude/**"
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+concurrency:
+  group: build-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  XCODEGEN_VERSION: "2.42.0"
+  SCHEME: LOOKSY
+  PROJECT: LOOKSY.xcodeproj
+
+jobs:
+  test:
+    name: Unit tests (iOS Simulator)
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: ./scripts/ci/select-xcode.sh
+
+      - name: Install XcodeGen
+        run: ./scripts/ci/install-xcodegen.sh
+
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate --spec project.yml
+          test -d "$PROJECT" || { echo "::error::XcodeGen did not create $PROJECT"; exit 1; }
+
+      - name: Pick simulator
+        id: sim
+        run: |
+          UDID=$(./scripts/ci/pick-simulator.sh)
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Run tests
+        run: |
+          ./scripts/ci/run-xcodebuild.sh build/xcodebuild-test.log test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath build/test \
+            -resultBundlePath build/TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            build/TestResults.xcresult
+            build/xcodebuild-test.log
+          retention-days: 7
+
+  build:
+    name: Build device IPA
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: ./scripts/ci/select-xcode.sh
+
+      - name: Install XcodeGen
+        run: ./scripts/ci/install-xcodegen.sh
+
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate --spec project.yml
+          test -d "$PROJECT" || { echo "::error::XcodeGen did not create $PROJECT"; exit 1; }
+
+      - name: Resolve dependencies
+        run: xcodebuild -resolvePackageDependencies -project "$PROJECT" -scheme "$SCHEME"
+
+      - name: Build for iPhone (iphoneos, unsigned)
+        run: |
+          ./scripts/ci/run-xcodebuild.sh build/xcodebuild-device.log build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Validate app bundle and package IPA
+        run: ./scripts/ci/package-ipa.sh build/device/Build/Products/Release-iphoneos/LOOKSY.app build/ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LOOKSY-ipa
+          path: |
+            build/ipa/LOOKSY-unsigned.ipa
+            build/ipa/LOOKSY-adhoc.ipa
+            build/ipa/BUILD_INFO.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: device-build-log
+          path: build/xcodebuild-device.log
+          retention-days: 7
